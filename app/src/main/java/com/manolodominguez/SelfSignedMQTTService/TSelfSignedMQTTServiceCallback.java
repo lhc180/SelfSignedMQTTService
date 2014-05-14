@@ -46,7 +46,7 @@ public class TSelfSignedMQTTServiceCallback implements MqttCallback {
      */
     @Override
     public void connectionLost(Throwable throwable) {
-        Log.i("[TSelfSignedSSLSocketFactory]", "Connection lost.");
+        Log.i("[TSelfSignedMQTTServiceCallback]", "Connection lost.");
     }
 
     /**
@@ -60,7 +60,7 @@ public class TSelfSignedMQTTServiceCallback implements MqttCallback {
      */
     @Override
     public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-        Log.i("[TSelfSignedSSLSocketFactory]", "Message arrived: " + mqttMessage.toString());
+        Log.i("[TSelfSignedMQTTServiceCallback]", "Message arrived: " + mqttMessage.toString());
     }
 
     /**
@@ -75,6 +75,6 @@ public class TSelfSignedMQTTServiceCallback implements MqttCallback {
      */
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-        Log.i("[TSelfSignedSSLSocketFactory]", "Message delivery identified by " + iMqttDeliveryToken.toString() + ", completed.");
+        Log.i("[TSelfSignedMQTTServiceCallback]", "Message delivery identified by " + iMqttDeliveryToken.toString() + ", completed.");
     }
 }

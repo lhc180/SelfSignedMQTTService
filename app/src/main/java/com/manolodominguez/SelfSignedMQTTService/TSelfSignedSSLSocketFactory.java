@@ -74,8 +74,8 @@ public class TSelfSignedSSLSocketFactory {
         // Load CA certificate file from an InputStream. For the context if this project, this
         // certificate correspond to the CA that signed the broker certificate. It can be a
         // created CA, a CA that usually are not reliable or a self-signed certificate.
-        // Certificate should be named "untrusted_ca.crt" and has to be stored in the res/raw
-        // folder of your Android project.
+        // Certificate should be stored in the res/raw folder of your Android project and configured
+        // in TMQTTBrokerConfig class.
         this.certificateFactory = CertificateFactory.getInstance("X.509");
         this.caInput = new BufferedInputStream(appResources.openRawResource(this.mqttBrokerConfig.getBrokerCACertificateFileResourceID()));
         // A X509 certificate is created from the information stored in the aforementioned file.
@@ -99,9 +99,9 @@ public class TSelfSignedSSLSocketFactory {
         // Create an SSLContext that uses our TrustManager to generate SSLSocket to connect the
         // remote MQTT broker through TLS.
         this.sslContext = SSLContext.getInstance(this.mqttBrokerConfig.getProtocol());
-        Log.i("[TSelfSignedSSLSocketFactory]", "Creado un contexto SSL con TLS");
+        Log.i("[TSelfSignedSSLSocketFactory]", "Created a SSLContext.");
         this.sslContext.init(null, this.trustManagerFactory.getTrustManagers(), null);
-        Log.i("[TSelfSignedSSLSocketFactory]", "Añadido al contexto SSL el certificado de Mosquito como confiable");
+        Log.i("[TSelfSignedSSLSocketFactory]", "Added the untrusted CA certificate to the SSLContext");
     }
 
     /**

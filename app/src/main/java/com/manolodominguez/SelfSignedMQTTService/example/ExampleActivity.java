@@ -34,10 +34,9 @@ import com.manolodominguez.SelfSignedMQTTService.R;
 import com.manolodominguez.SelfSignedMQTTService.TSelfSignedMQTTService;
 
 
-public class MainActivity extends Activity {
+public class ExampleActivity extends Activity {
 
-    public static final String SERVICE_CLASSNAME = "org.pruebasmqtt.app.TSelfSignedMQTTService";
-    TSelfSignedMQTTService ms;
+    TSelfSignedMQTTService mqttEnterpriseServiceBus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +52,12 @@ public class MainActivity extends Activity {
     private boolean serviceIsRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (SERVICE_CLASSNAME.equals(service.service.getClassName())) {
-                Log.i("[Main]", "Servicio running");
+            if (TSelfSignedMQTTService.SERVICE_CLASSNAME.equals(service.service.getClassName())) {
+                Log.i("[ExampleActivity]", "Service is running");
                 return true;
             }
         }
-        Log.i("[Main]", "Servicio no running");
+        Log.i("[ExampleActivity]", "Service is not running");
         return false;
     }
 
@@ -86,7 +85,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         final Intent intent = new Intent(this, TSelfSignedMQTTService.class);
         this.stopService(intent);
-        Log.i("[Main]", "Parando el servicio");
+        Log.i("[ExampleActivity]", "Stopping the service");
         super.onDestroy();
     }
 }

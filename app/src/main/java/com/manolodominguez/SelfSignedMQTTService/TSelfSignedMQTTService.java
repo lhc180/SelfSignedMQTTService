@@ -46,9 +46,12 @@ import java.security.cert.CertificateException;
  */
 public class TSelfSignedMQTTService extends Service {
 
+    public static final String SERVICE_CLASSNAME = "com.manolodominguez.SelfSignedMQTTService.TSelfSignedMQTTService";
+
     private TSelfSignedSSLSocketFactory selfSignedSSLSocketFactory;
-    private MqttClient tslMQTTClient;
+    private MqttClient tlsMQTTClient;
     private MqttConnectOptions mqttConnectOptions;
+    private TMQTTServiceConfig mqttServiceConfig;
 
     /**
      * This is the constructor of the class. It does nothing because the service is started by an
@@ -63,7 +66,7 @@ public class TSelfSignedMQTTService extends Service {
     /**
      * This method is called when an Activity bind this service by calling its bindService() method.
      * According to http://developer.android.com/guide/components/services.html, a service can be
-     * started (id started via Activity's startService() method) or bound (if started via Activity's
+     * started (if started via Activity's startService() method) or bound (if started via Activity's
      * bindService() method). If this is a bound service, this is the starting point of the service
      * after its creation.
      *
@@ -103,7 +106,7 @@ public class TSelfSignedMQTTService extends Service {
      * This method is called when an Activity bind this service by calling its bindService() method
      * and the service was previously unbound.
      * According to http://developer.android.com/guide/components/services.html, a service can be
-     * started (id started via Activity's startService() method) or bound (if started via Activity's
+     * started (if started via Activity's startService() method) or bound (if started via Activity's
      * bindService() method). If this is a bound service, this is the starting point of the service
      * after it was previously unbound.
      *
@@ -118,15 +121,10 @@ public class TSelfSignedMQTTService extends Service {
     }
 
     /**
-     * This method is called when an Activity bind this service by calling its bindService() method
-     * and the service was previously unbound.
-     * According to http://developer.android.com/guide/components/services.html, a service can be
-     * started (id started via Activity's startService() method) or bound (if started via Activity's
-     * bindService() method). If this is a bound service, this is the starting point of the service
-     * after it was previously unbound.
+     * This method is called when the service is created by the system. It is always called no
+     * matter if the service is started by Activity's startService() or bindService() and is called
+     * before the correspondent onStartCommand() or onBind().
      *
-     * @param intent The intent created by the Activity that is binding this TSelfSignedMQTTService
-     *               again and used to transport information needed to bind the service correctly.
      * @author Manuel Domínguez Dorado - ingeniero@ManoloDominguez.com
      * @since 1.0
      */
@@ -136,6 +134,8 @@ public class TSelfSignedMQTTService extends Service {
         try {
             this.selfSignedSSLSocketFactory = new TSelfSignedSSLSocketFactory(this.getResources());
             Log.i("[TSelfSignedMQTTService]", "selfSignedSSLSocketFactory was created.");
+            this.mqttServiceConfig = new TMQTTServiceConfig();
+            Log.i("[TSelfSignedMQTTService]", "Service was created.");
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -150,12 +150,11 @@ public class TSelfSignedMQTTService extends Service {
     }
 
     /**
-     * This method is called when an Activity bind this service by calling its bindService() method
-     * and the service was previously unbound.
+     * This method is called when an Activity start this service by calling its startService()
+     * method.
      * According to http://developer.android.com/guide/components/services.html, a service can be
-     * started (id started via Activity's startService() method) or bound (if started via Activity's
-     * bindService() method). If this is a bound service, this is the starting point of the service
-     * after it was previously unbound.
+     * started (if started via Activity's startService() method) or bound (if started via Activity's
+     * bindService() method). If this is a started service, this is the starting point of it.
      *
      * @param intent The intent created by the Activity that is binding this TSelfSignedMQTTService
      *               again and used to transport information needed to bind the service correctly.
@@ -165,14 +164,18 @@ public class TSelfSignedMQTTService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            this.tslMQTTClient = new MqttClient(this.selfSignedSSLSocketFactory.getAssociatedMQTTBrokerURL(), "consumerId", null);
-            this.tslMQTTClient.setCallback(new TSelfSignedMQTTServiceCallback());
+            this.tlsMQTTClient = new MqttClient(this.selfSignedSSLSocketFactory.getAssociatedMQTTBrokerURL(), this.mqttServiceConfig.getClientID(), null);
+            this.tlsMQTTClient.setCallback(new TSelfSignedMQTTServiceCallback());
             this.mqttConnectOptions = new MqttConnectOptions();
-            this.mqttConnectOptions.setConnectionTimeout(60);
-            this.mqttConnectOptions.setKeepAliveInterval(60);
+            this.mqttConnectOptions.setConnectionTimeout(this.mqttServiceConfig.getTimeOut());
+            this.mqttConnectOptions.setKeepAliveInterval(this.mqttServiceConfig.getKeepAliveInterval());
             this.mqttConnectOptions.setSocketFactory(this.selfSignedSSLSocketFactory.getSelfSignedSSLSocketFactory());
-            this.tslMQTTClient.connect(this.mqttConnectOptions);
-            this.tslMQTTClient.subscribe("lolete/hora");
+            Log.i("[TSelfSignedMQTTService]", "Connecting to remote MQTT broker.");
+            this.tlsMQTTClient.connect(this.mqttConnectOptions);
+            Log.i("[TSelfSignedMQTTService]", "Connected to remote MQTT broker.");
+            this.tlsMQTTClient.subscribe(this.mqttServiceConfig.getSucribeTopic());
+            Log.i("[TSelfSignedMQTTService]", "Subscribed to defined topics.");
+            Log.i("[TSelfSignedMQTTService]", "Waiting for messages arrivals from remote MQTT broker.");
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -183,13 +186,12 @@ public class TSelfSignedMQTTService extends Service {
     @Override
     public void onDestroy() {
         try {
-            tslMQTTClient.disconnect();
+            Log.i("[TSelfSignedMQTTService]", "Closing connection to remote MQTT broker.");
+            tlsMQTTClient.disconnect();
             Log.i("[TSelfSignedMQTTService]", "Connection to remote MQTT broker closed.");
         } catch (MqttException e) {
             e.printStackTrace();
         }
         super.onDestroy();
     }
-
-
 }

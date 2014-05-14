@@ -22,8 +22,8 @@
 package com.manolodominguez.SelfSignedMQTTService;
 
 /**
- * This class stores the configuration of a MQTT broker that listen TLS an has a self signed server
- * certificate or uses its own CA to sign it.
+ * This class stores the configuration of a remote MQTT broker that listen TLS an has a self signed
+ * server certificate or uses its own CA to sign it.
  *
  * @author Manuel Domínguez Dorado - ingeniero@ManoloDominguez.com
  * @version 1.0
@@ -32,6 +32,7 @@ public class TMQTTBrokerConfig {
 
     // These are the default values for the constructor of the class. If not specified other, these
     // values will be used as valid configuration to connect to the remote MQTT broker.
+    // ********************************************************************************
     // Change this constants as desired to fit your needs.
     // ********************************************************************************
     private static final int MQTT_BROKER_CONFIG_TLSPORT = 8883;
