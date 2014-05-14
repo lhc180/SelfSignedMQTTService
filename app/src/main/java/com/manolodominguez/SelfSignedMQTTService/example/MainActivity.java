@@ -19,7 +19,7 @@
 *     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package com.manolodominguez.SelfSignedMQTTService;
+package com.manolodominguez.SelfSignedMQTTService.example;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -29,6 +29,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.manolodominguez.SelfSignedMQTTService.R;
+import com.manolodominguez.SelfSignedMQTTService.TSelfSignedMQTTService;
 
 
 public class MainActivity extends Activity {
